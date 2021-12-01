@@ -1,13 +1,9 @@
 #include <string>
+#include "Token.h"
 
-class Token
+using std::string;
+
+string Token::toString()
 {
-public:
-    /*final */ int tag;
-    Token(int t) : tag(t){};
-
-    string toString()
-    {
-        return "" + (char)tag;
-    }
-};
+    return "" + (char)tag;
+}
