@@ -10,9 +10,9 @@ class Word : public Token
 public:
     string lexeme = "";
 
-    Word(string s, int t): Token(t)
+    Word(string s, int t) : Token(t)
     {
-        tag = t;
+        // tag = t;
         lexeme = s;
     }
 
@@ -21,16 +21,14 @@ public:
         return lexeme;
     }
 
-
-    static const Word 
-        and ("&&", Tag.AND),
-        or ("||", Tag.OR),
-        eq ("==", Tag.EQ),
-        ne ("!=", Tag.NE),
-        le ("<=", Tag.LE),
-        ge (">=", Tag.GE),
-        minus ("minus", Tag.MINUS),
-        True ("true", Tag.TRUE),
-        False ("false", Tag.FALSE),
-        temp ("t", Tag.TEMP);
+    static const Word and ("&&", Tag::AND);
+    static const Word or ("||", Tag::OR);
+    static const Word eq("==", Tag::EQ);
+    static const Word ne("!=", Tag::NE);
+    static const Word le("<=", Tag::LE);
+    static const Word ge(">=", Tag::GE);
+    static const Word minus("minus", Tag::MINUS);
+    static const Word True("true", Tag::TRUE);
+    static const Word False("false", Tag::FALSE);
+    static const Word temp("t", Tag::TEMP);
 }

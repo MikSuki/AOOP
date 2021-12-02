@@ -1,17 +1,18 @@
-public
-class Num extends Token
+#include "Token.h"
+#include "Tag.h"
+
+class Num : public Token
 {
-public
-    final int value;
-public
-    Num(int v)
+public:
+    int value;
+    
+    Num(int v) : Token(Tag::NUM)
     {
-        super(Tag.NUM);
         value = v;
     }
-public
-    String toString()
+    
+    string toString()
     {
         return "" + value;
     }
-}
+};

@@ -1,17 +1,18 @@
-public
-class Real extends Token
+#include "Token.h"
+#include "Tag.h"
+
+class Real : public Token
 {
-public
-    final float value;
-public
-    Real(float v)
+public:
+    float value;
+
+    Real(float v) : Token(Tag::REAL)
     {
-        super(Tag.REAL);
         value = v;
     }
-public
-    String toString()
+
+    string toString()
     {
-        return "" + value;
+        return std::to_string(value);
     }
-}
+};
