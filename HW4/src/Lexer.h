@@ -1,42 +1,69 @@
 #include <string>
 
-#include "Lexer.h"
-
 using std::string;
 
-static const Word AND("&&", Tag::AND);
-static const Word OR("||", Tag::OR);
-static const Word EQ("==", Tag::EQ);
-static const Word NE("!=", Tag::NE);
-static const Word LE("<=", Tag::LE);
-static const Word GE(">=", Tag::GE);
-static const Word MINUS("minus", Tag::MINUS);
-static const Word TRUE("true", Tag::TRUE);
-static const Word FALSE("false", Tag::FALSE);
-static const Word TEMP("t", Tag::TEMP);
-
-static const Type Int("int", Tag::BASIC, 4);
-static const Type Float("float", Tag::BASIC, 8);
-static const Type Char("char", Tag::BASIC, 1);
-static const Type Bool("bool", Tag::BASIC, 1);
-
-string Token::toString()
+class Tag
 {
-    return "" + (char)tag;
-}
+public:
+    const int static AND = 256,
+                     BASIC = 257,
+                     BREAK = 258,
+                     DO = 259,
+                     ELSE = 260,
+                     EQ = 261,
+                     FALSE = 262,
+                     GE = 263,
+                     ID = 264,
+                     IF = 265,
+                     INDEX = 266,
+                     LE = 267,
+                     MINUS = 268,
+                     NE = 269,
+                     NUM = 270,
+                     OR = 271,
+                     REAL = 272,
+                     TEMP = 273,
+                     TRUE = 274,
+                     WHILE = 275;
+};
 
-string Word::toString()
+class Token
 {
-    return lexeme;
-}
+public:
+    /*final */ int tag;
+    Token(int t) : tag(t){};
+    string toString();
+};
 
-bool Type::Numeric(Type p)
+class Word : public Token
 {
-    if (p == Char || p == Int || p == Float)
-        return true;
-    else
-        return false;
-}
+public:
+    string lexeme = "";
+    Word(string s, int t) : Token(t), lexeme(s){};
+    string toString();
+};
+
+class Type : public Word
+{
+public:
+    int width = 0;
+
+    Type(string s, int tag, int w) : Word(s, tag), width(w){};
+
+    static bool Numeric(Type p);
+
+    // static Type max(Type p1, Type p2)
+    // {
+    //     if (!numeric(p1) || !numeric(p2))
+    //         return null;
+    //     else if (p1 == Type.Float || p2 == Type.Float)
+    //         return Type.Float;
+    //     else if (p1 == Type.Int || p2 == Type.Int)
+    //         return Type.Int;
+    //     else
+    //         return Type.Char;
+    // }
+};
 
 class Num : public Token
 {
@@ -204,6 +231,17 @@ public:
     }
 };
 
-int main()
-{
-}
+
+// static const Word and("&&", static_cast<int>(Tag::AND));
+static const Word and ("&&", Tag::AND);
+// static const Word and ("&&", Tag::AND);
+// static const Word or ("||", Tag::OR);
+// static const Word eq("==", Tag::EQ);
+// static const Word ne("!=", Tag::NE);
+// static const Word le("<=", Tag::LE);
+// static const Word ge(">=", Tag::GE);
+// static const Word minus("minus", Tag::MINUS);
+// static const Word True("true", Tag::TRUE);
+// static const Word False("false", Tag::FALSE);
+// static const Word temp("t", Tag::TEMP);
+
