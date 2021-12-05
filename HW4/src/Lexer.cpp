@@ -1,8 +1,14 @@
 #include <string>
+#include <iostream>
+#include <ctype.h>
+#include <sstream>
 
-#include "Lexer.h"
+#include "lexer.h"
 
 using std::string;
+using std::stringstream;
+using std::to_string;
+using std::cin;
 
 static const Word AND("&&", Tag::AND);
 static const Word OR("||", Tag::OR);
@@ -30,6 +36,13 @@ string Word::toString()
     return lexeme;
 }
 
+bool Type::operator==(Type p)
+{
+    return this->lexeme == p.lexeme &&
+           this->tag == p.tag &&
+           this->width == p.width;
+}
+
 bool Type::Numeric(Type p)
 {
     if (p == Char || p == Int || p == Float)
@@ -38,172 +51,155 @@ bool Type::Numeric(Type p)
         return false;
 }
 
-class Num : public Token
+Type Type::max(Type p1, Type p2)
 {
-public:
-    int value;
+    if (!Type::Numeric(p1) || !Type::Numeric(p2))
+        return Type("", -1, -1);
+    else if (p1 == Float || p2 == Float)
+        return Float;
+    else if (p1 == Int || p2 == Int)
+        return Int;
+    else
+        return Char;
+}
 
-    Num(int v) : Token(Tag::NUM)
-    {
-        value = v;
-    }
-
-    string toString()
-    {
-        return "" + value;
-    }
-};
-
-class Real : public Token
+string Num::toString()
 {
-public:
-    float value;
+    return "" + value;
+}
 
-    Real(float v) : Token(Tag::REAL)
-    {
-        value = v;
-    }
-
-    string toString()
-    {
-        return std::to_string(value);
-    }
-};
-
-class Lexer
+string Real::toString()
 {
-public:
-    static int line = 1;
-    char peek = ' ';
-    Hashtable words = new Hashtable();
+    return to_string(value);
+}
 
-    void reserve(Word w)
-    {
-        words.put(w.lexeme, w);
-    }
+int Lexer::line = 1;
 
-    Lexer()
+void Lexer::reserve(Word w)
+{
+    words.insert(pair<string, Word>(w.lexeme, w));
+}
+
+Lexer::Lexer()
+{
+    // line = 1;
+    reserve(Word("if", Tag::IF));
+    reserve(Word("else", Tag::ELSE));
+    reserve(Word("while", Tag::WHILE));
+    reserve(Word("do", Tag::DO));
+    reserve(Word("break", Tag::BREAK));
+    reserve(TRUE);
+    reserve(FALSE);
+    reserve(Int);
+    reserve(Char);
+    reserve(Bool);
+    reserve(Float);
+}
+
+void Lexer::readch()
+{
+    if (!cin.get(peek))
+        throw "End of file reached";
+}
+
+bool Lexer::readch(char c)
+{
+    readch();
+    if (peek != c)
+        return false;
+    peek = ' ';
+    return true;
+}
+
+Token Lexer::scan()
+{
+    for (;; readch())
     {
-        reserve(Word("if", Tag::IF));
-        reserve(Word("else", Tag::ELSE));
-        reserve(Word("while", Tag::WHILE));
-        reserve(Word("do", Tag::DO));
-        reserve(Word("break", Tag::BREAK));
-        reserve(Word::True);
-        reserve(Word::False);
-        reserve(Type::Int);
-        reserve(Type::Char);
-        reserve(Type::Bool);
-        reserve(Type::Float);
-    }
-    void readch() throws IOException
-    {
-        int i = System.in.read();
-        if (i != -1)
-            peek = (char)i;
+        if (peek == ' ' || peek == '\t')
+            continue;
+        else if (peek == '\n')
+            line = line + 1;
         else
-            throw new IOException("End of file reached");
+            break;
     }
-    boolean readch(char c) throws IOException
+    switch (peek)
     {
-        readch();
-        if (peek != c)
-            return false;
-        peek = ’ ’;
-        return true;
+    case '&':
+        if (readch('&'))
+            return AND;
+        else
+            return Token('&');
+    case '|':
+        if (readch('|'))
+            return OR;
+        else
+            return Token('|');
+    case '=':
+        if (readch('='))
+            return EQ;
+        else
+            return Token('=');
+    case '!':
+        if (readch('='))
+            return NE;
+        else
+            return Token('!');
+    case '<':
+        if (readch('='))
+            return LE;
+        else
+            return Token('<');
+    case '>':
+        if (readch('='))
+            return GE;
+        else
+            return Token('>');
     }
 
-    Token scan() throws IOException
+    if (isdigit(peek))
     {
-        for (;; readch())
+        int v = 0;
+        do
         {
-            if (peek == ’ ’ || peek == ’\t’)
-                continue;
-            else if (peek == ’\n’)
-                line = line + 1;
-            else
+            v = 10 * v + (peek - '0');
+            readch();
+        } while (isdigit(peek));
+        if (peek != '.')
+            return Num(v);
+
+        // peek is float
+        float x = v;
+        float d = 10;
+        for (;;)
+        {
+            readch();
+            if (!isdigit(peek))
                 break;
+            x = x + (peek - '0') / d;
+            d = d * 10;
         }
-        switch (peek)
-        {
-        case ’&’:
-            if (readch(’&’))
-                return Word.and;
-            else
-                return new Token(’&’);
-        case ’|’:
-            if (readch(’|’))
-                return Word.or ;
-            else
-                return new Token(’|’);
-        case ’=’:
-            if (readch(’=’))
-                return Word.eq;
-            else
-                return new Token(’=’);
-        case ’!’:
-            if (readch(’=’))
-                return Word.ne;
-            else
-                return new Token(’!’);
-        case ’<’:
-            if (readch(’=’))
-                return Word.le;
-            else
-                return new Token(’<’);
-        case ’>’:
-            if (readch(’=’))
-                return Word.ge;
-            else
-                return new Token(’>’);
-        }
-
-        if (Character.isDigit(peek))
-        {
-            int v = 0;
-            do
-            {
-                v = 10 * v + Character.digit(peek, 10);
-                readch();
-            } while (Character.isDigit(peek));
-            if (peek != ’.’)
-                return new Num(v);
-            float x = v;
-            float d = 10;
-            for (;;)
-            {
-                readch();
-                if (!Character.isDigit(peek))
-                    break;
-                x = x + Character.digit(peek, 10) / d;
-                d = d * 10;
-            }
-            return new Real(x);
-        }
-
-        if (Character.isLetter(peek))
-        {
-            StringBuffer b = new StringBuffer();
-            do
-            {
-                b.append(peek);
-                readch();
-            } while (Character.isLetterOrDigit(peek));
-            String s = b.toString();
-            Word w = (Word)words.get(s);
-            if (w != null)
-                return w;
-            w = new Word(s, Tag.ID);
-            words.put(s, w);
-            return w;
-        }
-
-        Token tok = new Token(peek);
-        peek = ’ ’;
-        return tok;
+        return Real(x);
     }
-};
 
-int main()
-{
+    if (isalpha(peek))
+    {
+        stringstream ss;
+        do
+        {
+            ss << peek;
+            readch();
+        } while (isalnum(peek));
+        string s = ss.str();
+        map<string, Word>::iterator it = words.find(s);
+        // if element found;
+        if (it != words.end())
+            return it->second;
+        Word w(s, Tag::ID);
+        words.insert(pair<string, Word>(s, w));
+        return w;
+    }
+
+    Token tok = Token(peek);
+    peek = ' ';
+    return tok;
 }
