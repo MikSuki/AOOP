@@ -37,7 +37,7 @@ class Token
 public:
     /*final */ int tag;
     Token(int t) : tag(t){};
-    string toString();
+    virtual string toString();
 };
 
 class Word : public Token
@@ -45,7 +45,7 @@ class Word : public Token
 public:
     string lexeme = "";
     Word(string s, int t) : Token(t), lexeme(s){};
-    string toString();
+    virtual string toString() override;
 };
 
 class Type : public Word
@@ -63,7 +63,7 @@ class Num : public Token
 public:
     int value;
     Num(int v) : Token(Tag::NUM), value(v){};
-    string toString();
+    virtual string toString() override;
 };
 
 class Real : public Token
@@ -71,19 +71,21 @@ class Real : public Token
 public:
     float value;
     Real(float v) : Token(Tag::REAL), value(v){};
-    string toString();
+    virtual string toString() override;
 };
 
 class Lexer
 {
 public:
     static int line;
+    string str;
+    int i = 0;
     char peek = ' ';
     // Hashtable words = new Hashtable();
     map<string, Word> words;
 
     void reserve(Word w);
-    Lexer();
+    Lexer(string);
     void readch();
     bool readch(char c);
     Token scan();

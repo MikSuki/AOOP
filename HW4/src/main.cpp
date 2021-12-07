@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "lexer.h"
 
@@ -12,10 +13,20 @@ char peek = ' ';
 //         throw "End of file reached";
 // }
 
-
 int main()
 {
-    Lexer lexer;
+    string line;
+    string lines;
+
+    // Read from the text file
+    std::ifstream MyReadFile("try");
+
+    // read file
+    while (getline(MyReadFile, line))
+        lines += line;
+    // cout << lines << endl;
+
+    Lexer lexer(lines);
 
     try
     {
@@ -23,18 +34,19 @@ int main()
         // {
         //     cout << peek << endl;
         // }
-        while (true)
+        int cnt = 10;
+        int i = 0;
+        // while (true)
+        while(++i < cnt)
         {
-            Token t = lexer.scan();
-            cout << t.toString()<<endl;
+            cout << "Token: ";
+            Token *t;
+            t = &(lexer.scan());
+            cout << t->toString() << endl;
         }
     }
-    catch (const char* message) {
-        cout << "error";
+    catch (const char *message)
+    {
         cout << message << endl;
     }
-    // catch (IOExeception &e)
-    // {
-    //     cout << e.what() << endl;
-    // }
 }

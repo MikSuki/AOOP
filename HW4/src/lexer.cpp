@@ -5,10 +5,10 @@
 
 #include "lexer.h"
 
+using std::cout;
 using std::string;
 using std::stringstream;
 using std::to_string;
-using std::cin;
 
 static const Word AND("&&", Tag::AND);
 static const Word OR("||", Tag::OR);
@@ -28,6 +28,8 @@ static const Type Bool("bool", Tag::BASIC, 1);
 
 string Token::toString()
 {
+    std::cout << "tag: " <<tag << std::endl;
+
     string s;
     s = tag;
     return s;
@@ -83,8 +85,10 @@ void Lexer::reserve(Word w)
     words.insert(pair<string, Word>(w.lexeme, w));
 }
 
-Lexer::Lexer()
+Lexer::Lexer(string s)
 {
+    str = s;
+    i = 0;
     reserve(Word("if", Tag::IF));
     reserve(Word("else", Tag::ELSE));
     reserve(Word("while", Tag::WHILE));
@@ -100,7 +104,8 @@ Lexer::Lexer()
 
 void Lexer::readch()
 {
-    if (!cin.get(peek))
+    peek = str[i++];
+    if (i > str.size())
         throw "End of file reached";
 }
 
@@ -161,14 +166,17 @@ Token Lexer::scan()
     if (isdigit(peek))
     {
         int v = 0;
-        return Num(peek);
-        // do
-        // {
-        //     v = 10 * v + (peek - '0');
-        //     readch();
-        // } while (isdigit(peek));
-        if (peek != '.')
+        // printf("%d", peek-'0');
+        // return Num(peek - '0');
+        do
+        {
+            v = 10 * v + (peek - '0');
+            readch();
+        } while (isdigit(peek));
+        if (peek != '.'){
+            cout << v;
             return Num(v);
+        }
 
         // peek is float
         float x = v;
@@ -181,6 +189,7 @@ Token Lexer::scan()
             x = x + (peek - '0') / d;
             d = d * 10;
         }
+        cout << x;
         return Real(x);
     }
 
