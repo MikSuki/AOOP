@@ -42,7 +42,10 @@
         "typeinfo": "cpp",
         "complex": "cpp",
         "iostream": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "bit": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp"
     },
     // "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -28,7 +28,10 @@ static const Type Bool("bool", Tag::BASIC, 1);
 
 string Token::toString()
 {
-    return "" + (char)tag;
+    string s;
+    s = tag;
+    return s;
+    // return "" + (char)tag;
 }
 
 string Word::toString()
@@ -65,7 +68,7 @@ Type Type::max(Type p1, Type p2)
 
 string Num::toString()
 {
-    return "" + value;
+    return to_string(value);
 }
 
 string Real::toString()
@@ -82,7 +85,6 @@ void Lexer::reserve(Word w)
 
 Lexer::Lexer()
 {
-    // line = 1;
     reserve(Word("if", Tag::IF));
     reserve(Word("else", Tag::ELSE));
     reserve(Word("while", Tag::WHILE));
@@ -159,11 +161,12 @@ Token Lexer::scan()
     if (isdigit(peek))
     {
         int v = 0;
-        do
-        {
-            v = 10 * v + (peek - '0');
-            readch();
-        } while (isdigit(peek));
+        return Num(peek);
+        // do
+        // {
+        //     v = 10 * v + (peek - '0');
+        //     readch();
+        // } while (isdigit(peek));
         if (peek != '.')
             return Num(v);
 
