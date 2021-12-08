@@ -30,6 +30,7 @@ public:
                      TEMP = 273,
                      TRUE = 274,
                      WHILE = 275;
+    static string toString(int v);
 };
 
 class Token
@@ -90,5 +91,8 @@ public:
     bool readch(char c);
     Token scan();
 };
+
+extern string tok;
+extern string output;
 
 #endif
