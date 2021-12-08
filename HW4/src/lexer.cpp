@@ -26,14 +26,58 @@ static const Type Float("float", Tag::BASIC, 8);
 static const Type Char("char", Tag::BASIC, 1);
 static const Type Bool("bool", Tag::BASIC, 1);
 
+string Tag::toString(int v)
+{
+    switch (v)
+    {
+    case AND:
+        return "AND";
+    case BASIC:
+        return "BASIC";
+    case BREAK:
+        return "BREAK";
+    case DO:
+        return "DO";
+    case ELSE:
+        return "ELSE";
+    case EQ:
+        return "EQ";
+    case FALSE:
+        return "FALSE";
+    case GE:
+        return "GE";
+    case ID:
+        return "ID";
+    case IF:
+        return "IF";
+    case INDEX:
+        return "INDEX";
+    case LE:
+        return "LE";
+    case MINUS:
+        return "MINUS";
+    case NE:
+        return "NE";
+    case NUM:
+        return "NUM";
+    case OR:
+        return "OR";
+    case TEMP:
+        return "TEMP";
+    case REAL:
+        return "REAL";
+    case TRUE:
+        return "TRUE";
+    case WHILE:
+        return "WHILE";
+    default:
+        return "-1";
+    }
+}
+
 string Token::toString()
 {
-    std::cout << "tag: " <<tag << std::endl;
-
-    string s;
-    s = tag;
-    return s;
-    // return "" + (char)tag;
+    return Tag::toString(tag);
 }
 
 string Word::toString()
@@ -105,8 +149,10 @@ Lexer::Lexer(string s)
 void Lexer::readch()
 {
     peek = str[i++];
-    if (i > str.size())
+    if (i > str.size()){
         throw "End of file reached";
+    }
+        
 }
 
 bool Lexer::readch(char c)
@@ -129,36 +175,61 @@ Token Lexer::scan()
         else
             break;
     }
+    tok = peek;
     switch (peek)
     {
     case '&':
+        output += peek;
         if (readch('&'))
+        {
+            output += '&';
             return AND;
+        }
         else
             return Token('&');
     case '|':
+        output += peek;
         if (readch('|'))
+        {
+            output += '|';
             return OR;
+        }
         else
             return Token('|');
     case '=':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return EQ;
+        }
         else
             return Token('=');
     case '!':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return NE;
+        }
         else
             return Token('!');
     case '<':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return LE;
+        }
         else
             return Token('<');
     case '>':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return GE;
+        }
         else
             return Token('>');
     }
@@ -166,15 +237,14 @@ Token Lexer::scan()
     if (isdigit(peek))
     {
         int v = 0;
-        // printf("%d", peek-'0');
-        // return Num(peek - '0');
         do
         {
             v = 10 * v + (peek - '0');
             readch();
         } while (isdigit(peek));
-        if (peek != '.'){
-            cout << v;
+        if (peek != '.')
+        {
+            output += to_string(v);
             return Num(v);
         }
 
@@ -189,7 +259,7 @@ Token Lexer::scan()
             x = x + (peek - '0') / d;
             d = d * 10;
         }
-        cout << x;
+        output += to_string(x);
         return Real(x);
     }
 
@@ -205,13 +275,17 @@ Token Lexer::scan()
         map<string, Word>::iterator it = words.find(s);
         // if element found;
         if (it != words.end())
+        {
+            output += it->second.lexeme;
             return it->second;
+        }
         Word w(s, Tag::ID);
         words.insert(pair<string, Word>(s, w));
+        output += w.lexeme;
         return w;
     }
-
-    Token tok = Token(peek);
+    output += peek;
+    Token token = Token(peek);
     peek = ' ';
-    return tok;
+    return token;
 }
