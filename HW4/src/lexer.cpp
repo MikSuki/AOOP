@@ -5,10 +5,10 @@
 
 #include "lexer.h"
 
+using std::cout;
 using std::string;
 using std::stringstream;
 using std::to_string;
-using std::cin;
 
 static const Word AND("&&", Tag::AND);
 static const Word OR("||", Tag::OR);
@@ -26,9 +26,58 @@ static const Type Float("float", Tag::BASIC, 8);
 static const Type Char("char", Tag::BASIC, 1);
 static const Type Bool("bool", Tag::BASIC, 1);
 
+string Tag::toString(int v)
+{
+    switch (v)
+    {
+    case AND:
+        return "AND";
+    case BASIC:
+        return "BASIC";
+    case BREAK:
+        return "BREAK";
+    case DO:
+        return "DO";
+    case ELSE:
+        return "ELSE";
+    case EQ:
+        return "EQ";
+    case FALSE:
+        return "FALSE";
+    case GE:
+        return "GE";
+    case ID:
+        return "ID";
+    case IF:
+        return "IF";
+    case INDEX:
+        return "INDEX";
+    case LE:
+        return "LE";
+    case MINUS:
+        return "MINUS";
+    case NE:
+        return "NE";
+    case NUM:
+        return "NUM";
+    case OR:
+        return "OR";
+    case TEMP:
+        return "TEMP";
+    case REAL:
+        return "REAL";
+    case TRUE:
+        return "TRUE";
+    case WHILE:
+        return "WHILE";
+    default:
+        return "-1";
+    }
+}
+
 string Token::toString()
 {
-    return "" + (char)tag;
+    return Tag::toString(tag);
 }
 
 string Word::toString()
@@ -65,7 +114,7 @@ Type Type::max(Type p1, Type p2)
 
 string Num::toString()
 {
-    return "" + value;
+    return to_string(value);
 }
 
 string Real::toString()
@@ -80,9 +129,10 @@ void Lexer::reserve(Word w)
     words.insert(pair<string, Word>(w.lexeme, w));
 }
 
-Lexer::Lexer()
+Lexer::Lexer(string s)
 {
-    // line = 1;
+    str = s;
+    i = 0;
     reserve(Word("if", Tag::IF));
     reserve(Word("else", Tag::ELSE));
     reserve(Word("while", Tag::WHILE));
@@ -98,8 +148,11 @@ Lexer::Lexer()
 
 void Lexer::readch()
 {
-    if (!cin.get(peek))
+    peek = str[i++];
+    if (i > str.size()){
         throw "End of file reached";
+    }
+        
 }
 
 bool Lexer::readch(char c)
@@ -122,36 +175,61 @@ Token Lexer::scan()
         else
             break;
     }
+    tok = peek;
     switch (peek)
     {
     case '&':
+        output += peek;
         if (readch('&'))
+        {
+            output += '&';
             return AND;
+        }
         else
             return Token('&');
     case '|':
+        output += peek;
         if (readch('|'))
+        {
+            output += '|';
             return OR;
+        }
         else
             return Token('|');
     case '=':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return EQ;
+        }
         else
             return Token('=');
     case '!':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return NE;
+        }
         else
             return Token('!');
     case '<':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return LE;
+        }
         else
             return Token('<');
     case '>':
+        output += peek;
         if (readch('='))
+        {
+            output += '=';
             return GE;
+        }
         else
             return Token('>');
     }
@@ -165,7 +243,10 @@ Token Lexer::scan()
             readch();
         } while (isdigit(peek));
         if (peek != '.')
+        {
+            output += to_string(v);
             return Num(v);
+        }
 
         // peek is float
         float x = v;
@@ -178,6 +259,7 @@ Token Lexer::scan()
             x = x + (peek - '0') / d;
             d = d * 10;
         }
+        output += to_string(x);
         return Real(x);
     }
 
@@ -193,13 +275,17 @@ Token Lexer::scan()
         map<string, Word>::iterator it = words.find(s);
         // if element found;
         if (it != words.end())
+        {
+            output += it->second.lexeme;
             return it->second;
+        }
         Word w(s, Tag::ID);
         words.insert(pair<string, Word>(s, w));
+        output += w.lexeme;
         return w;
     }
-
-    Token tok = Token(peek);
+    output += peek;
+    Token token = Token(peek);
     peek = ' ';
-    return tok;
+    return token;
 }
