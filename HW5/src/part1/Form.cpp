@@ -1,5 +1,7 @@
 #include "Form.h"
 
+using std::setprecision;
+
 Form &Form::operator()(double n)
 {
     value = n;
@@ -26,23 +28,20 @@ Form &Form::fixed()
 
 std::ostream &operator<<(std::ostream &output, const Form &form)
 {
-    std::ios_base::fmtflags oriForm = output.flags();
     switch (form.type)
     {
     case 0:
-        output << std::setprecision(form.prec) << form.value;
+        output << setprecision(form.prec) << form.value;
         break;
     case 1:
-        output << std::scientific << std::setprecision(form.prec) << form.value;
+        output << std::scientific << setprecision(form.prec) << form.value;
         break;
     case 2:
-        output << std::fixed << std::setprecision(form.prec) << form.value;
-        break;
-    default:
+        output << std::fixed << setprecision(form.prec) << form.value;
         break;
     }
 
-    output.flags(oriForm);
-    output << std::setprecision(6);
+    output << std::defaultfloat;
+    output << setprecision(6);
     return output;
 }
