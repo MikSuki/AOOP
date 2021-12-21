@@ -31,19 +31,19 @@ int main()
     pfvec.elem(3) = &f;
     pfvec[3] = &f;
     cout << "  pfvec.elem(3) = " << *pfvec.elem(3) << endl;
-    cout << "  pfvec[3] = " << *pfvec[3] << endl;
+    cout << "  pfvec[3]      = " << *pfvec[3] << endl;
 
     int a = 10;
     pivec.elem(3) = &a;
     pivec[3] = &a;
     cout << "  pivec.elem(3) = " << *pivec.elem(3) << endl;
-    cout << "  pivec[3] = " << *pivec[3] << endl;
+    cout << "  pivec[3]      = " << *pivec[3] << endl;
 
     char c = 'A';
     pcvec.elem(3) = &c;
     pcvec[3] = &c;
     cout << "  pcvec.elem(3) = " << *pcvec.elem(3) << endl;
-    cout << "  pcvec[3] = " << *pcvec[3] << endl;
+    cout << "  pcvec[3]      = " << *pcvec[3] << endl;
 
     return 0;
 }

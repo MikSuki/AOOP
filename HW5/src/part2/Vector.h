@@ -1,91 +1,88 @@
 #ifndef __VECTOR_H_INCLUDED__
 #define __VECTOR_H_INCLUDED__
+#define __TRACE__
 
 #include <vector>
 #include <iostream>
 
 #include "Trace.h"
 
-// General (T) vector class
-template<class T>
-class vector{
+using std::cout;
+using std::endl;
+
+template <class T>
+class vector
+{
 public:
-    // Default constructor
-    explicit vector(const int& size = 0)
-    :vec(size){
-        Trace dummy("vector<T>::vector(int)");
-        std::cout << "   count = 1" << std::endl;
-    }
-    
-    // Destructor
-    ~vector(){
-        Trace dummy("vector<T>::~vector(int)");
-        std::cout << "   count = 1" << std::endl;
-    }
-    
-    // Overloading []
-    inline T& operator[](const unsigned int& i){return vec[i];}
-    
-    // Get the lvalue of an i-th element
-    inline T& elem(const unsigned int& i){return vec[i];}
-    
-private:
     std::vector<T> vec;
+
+    vector(int size)
+        : vec(size)
+    {
+        TRACE(dummy, "vector<T>::vector(int)");
+        cout << "   count = 1" << endl;
+    }
+
+    ~vector()
+    {
+        TRACE(dummy, "vector<T>::~vector");
+        cout << "   count = 1" << endl;
+    }
+
+    T &operator[](int i)
+    {
+        return vec[i];
+    }
 };
 
-// Specialized (void*) vector class
-template<>
-class vector<void*>{
+template <>
+class vector<void *>
+{
 public:
-    // Default constructor
-    explicit vector(const int& size = 0)
-    :vec(size){
-        Trace dummy("vector<void*>::vector(int)");
-        std::cout << "   count = " << ++count << std::endl;
-    }
-    
-    // Destructor
-    ~vector(){
-        Trace dummy("vector<T>::~vector(int)");
-        std::cout << "   count = " << count-- << std::endl;
-    }
-    
-    // Overloading []
-    inline void*& operator[](const unsigned int& i){return vec[i];}
-    
-    // Get the lvalue of an i-th element
-    inline void*& elem(const unsigned int& i){return vec[i];}
-
-private:
-    std::vector<void*> vec;
+    std::vector<void *> vec;
     static int count;
+
+    vector(int size)
+        : vec(size)
+    {
+        TRACE(dummy, "vector<void*>::vector(int)");
+        cout << "   count = " << ++count << endl;
+    }
+
+    ~vector()
+    {
+        TRACE(dummy, "vector<void*>::~vector");
+        cout << "   count = " << count-- << endl;
+    }
 };
 
-// Specialized (T*) vector class
-template<typename T>
-class vector<T*> : private vector<void*>{
+template <typename T>
+class vector<T *> : private vector<void *>
+{
 public:
-    typedef vector<void*> base;
-    
-    // Default constructor
-    explicit vector(const int& size = 0)
-    :base(size), vec(size){
-        Trace dummy("vector<T*>::vector(int)");
+    std::vector<T *> vec;
+    typedef vector<void *> base;
+
+    vector(int size)
+        : base(size), vec(size)
+    {
+        TRACE(dummy, "vector<T*>::vector(int)");
     }
-    
-    // Destructor
-    ~vector(){
-        Trace dummy("vector<T*>::~vector(int)");
+
+    ~vector()
+    {
+        TRACE(dummy, "vector<T*>::~vector");
     }
-    
-    // Overloading []
-    inline T*& operator[](unsigned int i){return vec[i];}
-    
-    // Get the lvalue of an i-th element
-    inline T*& elem(unsigned int i){return vec[i];}
-    
-private:
-    std::vector<T*> vec;
+
+    T *&operator[](int i)
+    {
+        return vec[i];
+    }
+
+    T *&elem(int i)
+    {
+        return vec[i];
+    }
 };
 
 #endif

@@ -14,7 +14,6 @@ public:
     Trace(const string n)
         : name(n)
     {
-
         depth++;
         print_name("Entering");
     }
